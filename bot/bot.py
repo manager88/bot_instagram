@@ -278,10 +278,8 @@ def run_bot():
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("balance", balance))
     app.add_handler(CommandHandler("charge", charge))
     app.add_handler(CallbackQueryHandler(handle_button))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_link))
     app.add_handler(conv_handler)
 
     logger.info("🤖 Bot started...")
