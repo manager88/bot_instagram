@@ -13,7 +13,6 @@ def request_payment(amount, description, callback_url, merchant_id):
         "callback_url": callback_url,
     }
     res = requests.post(f"{ZARINPAL_API}/request.json", json=data).json()
-    print(res)
     if res["data"]["code"] == 100:
         authority = res["data"]["authority"]
         #pay_url = f"https://www.zarinpal.com/pg/StartPay/{authority}"

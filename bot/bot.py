@@ -124,7 +124,7 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query.data == "balance":
         user = await get_user_by_telrgramid(update.effective_user.id)
-        await update.message.reply_text(f"💰 موجودی شما: {user.balance} ریال")
+        await query.message.reply_text(f"💰 موجودی شما: {user.balance} ریال")
         return ConversationHandler.END
     
 
@@ -156,8 +156,6 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
         resp = requests.get(f"https://api.one-api.ir/instagram/v1/post/?shortcode={x[4]}",headers = IDPAY_HEADER,).json()
-        print("yess..")
-        print(resp['result']['media'][0])
         if resp['status']==200:
             
             media=resp['result']['media'][0]
@@ -198,8 +196,6 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
         resp = requests.get(f"https://api.one-api.ir/instagram/v1/post/?shortcode={x[4]}",headers = IDPAY_HEADER,).json()
-        print("yess..")
-        print(resp['result']['media'][0])
         if resp['status']==200:
             
             media=resp['result']['media'][0]
@@ -226,7 +222,9 @@ async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     t_amount = update.message.text
-    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {t_amount} ریال ثبت شد.")
+    t_amount = int(t_amount)
+
+    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.")
     # اینجا می‌تونی پرداخت زرین‌پال رو فراخوانی کنی
     user = await get_user_by_telrgramid(update.effective_user.id)
 
@@ -241,14 +239,14 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         merchant_id=settings.ZARINPAL_MERCHANT_ID,
     )
     tx.authority = authority
-    #await sync_to_async(tx.save)()
+    await sync_to_async(tx.save)()
     if pay_url:
-        #await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
-        await update.message.reply_text(" پرداخت با موفقیت انجام شد ، کیف پول شارژ شد.")
-        tx.status = "SUCCESS"
-        tx.user.balance += tx.amount
-        await sync_to_async(tx.user.save)()
-        await sync_to_async(tx.save)()
+        await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
+        #await update.message.reply_text(" پرداخت با موفقیت انجام شد ، کیف پول شارژ شد.")
+        # tx.status = "SUCCESS"
+        # tx.user.balance += tx.amount
+        # await sync_to_async(tx.user.save)()
+        # await sync_to_async(tx.save)()
     else:
         await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
     return ConversationHandler.END
