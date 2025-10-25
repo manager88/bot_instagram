@@ -86,26 +86,26 @@ WSGI_APPLICATION = 'bot_telegram_wallet.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': "mahdidbroc_db",
-#         'HOST':"mahdidb-uyc-service",
-#         'USER': "root",
-#         'PASSWORD':"iyOZnwI7iT2JxXL8xhzu",
-#     }
-# }
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "telegram_bot",
-        'HOST':"127.0.0.1",
+        'NAME': "botinstaell_db",
+        'HOST':"botinstagram-mgd-service",
         'USER': "root",
-        'PASSWORD':"ء@دشلثق88",
+        'PASSWORD':"tn25LejucaPWEEWZ5mpt",
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': "telegram_bot",
+#         'HOST':"127.0.0.1",
+#         'USER': "root",
+#         'PASSWORD':"ء@دشلثق88",
+#     }
+# }
 
 
 
@@ -157,5 +157,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TELEGRAM_TOKEN="7958296718:AAGIAKRBL9F4BHy6CHUdgnGBzbaYpf6MC1c"
 ZARINPAL_MERCHANT_ID="4cbec259-a742-421b-8dd8-7ef25a5e510d"
 ONE_API_TOKEN="927701:68f5429ac9496"
-BASE_URL="http://127.0.0.1:8000/"
+BASE_URL="http://api.neginbaspar.ir/"
 ZARINPAL_CALLBACK_URL=f"{BASE_URL}zarinpal/verify/"
