@@ -46,10 +46,7 @@ IDPAY_HEADER = {
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_user = update.effective_user
-    print("id is :" ,tg_user)
-    print("id is :" ,tg_user.id)
-    print("id is :" ,tg_user.username)
-    print("id is :" ,tg_user.full_name)
+    
 
     user, created = await get_or_create_user(tg_user)
 
@@ -256,10 +253,13 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
     return ConversationHandler.END
 
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("عملیات لغو شد.")
+    return ConversationHandler.END
 
 
 conv_handler = ConversationHandler(
-    entry_points=[CallbackQueryHandler(handle_button)],
+    entry_points=[CommandHandler("start", start),CallbackQueryHandler(handle_button)],
     states={
         WAITING_POST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link)],
         WAITING_REALS_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_reals_link)],
@@ -267,7 +267,8 @@ conv_handler = ConversationHandler(
         WAITING_STORY_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_story_link)],
         WAITING_CHARGE_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_charge)],
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler("cancel", cancel)],
+    per_user=True, 
 )
 
 
@@ -277,9 +278,6 @@ def run_bot():
     token = settings.TELEGRAM_TOKEN
     app = ApplicationBuilder().token(token).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("charge", charge))
-    app.add_handler(CallbackQueryHandler(handle_button))
     app.add_handler(conv_handler)
 
     logger.info("🤖 Bot started...")
