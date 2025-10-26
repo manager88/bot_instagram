@@ -11,13 +11,7 @@ User = get_user_model()
 from .models import Transaction
 from .utils import request_payment
 
-main_menu_buttons = [
-    [
-        InlineKeyboardButton("🏠 منوی اصلی", callback_data="main_menu"),
-        #InlineKeyboardButton("↩️ بازگشت", callback_data="back")
-    ]
-]
-main_menu_markup = InlineKeyboardMarkup(main_menu_buttons)
+
 
 cancel_keyboard = InlineKeyboardMarkup([
     [InlineKeyboardButton("❌ انصراف و بازگشت به منو", callback_data="cancel")]
@@ -119,7 +113,7 @@ async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    if query.data == "main_menu":
+    if query.data == "cancel":
         # بازگشت به منوی اصلی
         keyboard = [
             [InlineKeyboardButton("📥 دانلود پست اینستاگرام", callback_data="download_post")],
@@ -133,10 +127,7 @@ async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text("🏠 بازگشت به منوی اصلی:", reply_markup=markup)
         return ConversationHandler.END
 
-    elif query.data == "back":
-        await query.message.reply_text("↩️ به مرحله قبل بازگشتید.")
-        return ConversationHandler.END
-
+    
 
 
 
@@ -187,7 +178,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
     x = link.split("/")
-    await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
+    await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}")
     #await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
     # اینجا می‌تونی کار دانلود پست از API رو انجام بدی
     """وقتی کاربر لینک ریلز اینستا می‌فرسته"""
@@ -196,7 +187,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.balance < cost:
         await update.message.reply_text(
             "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید"
-        , reply_markup=main_menu_markup)
+        )
         return
 
     # کم کردن از کیف پول
@@ -208,7 +199,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await create_transaction(user, cost, t_type="CHARGE", t_status="SUCCESS")
 
     
-    await update.message.reply_text("🔄 در حال دریافت ریلز از اینستاگرام...", reply_markup=main_menu_markup)
+    await update.message.reply_text("🔄 در حال دریافت ریلز از اینستاگرام...")
 
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
@@ -217,9 +208,9 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}", reply_markup=main_menu_markup)
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=main_menu_markup)
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
         logger.error(e)
 
     return ConversationHandler.END
@@ -227,13 +218,13 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
-    await update.message.reply_text(f"✅ لینک هایلایت دریافت شد:\n{link}", reply_markup=main_menu_markup)
+    await update.message.reply_text(f"✅ لینک هایلایت دریافت شد:\n{link}")
     return ConversationHandler.END
 
 
 async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
-    await update.message.reply_text(f"✅ لینک استوری دریافت شد:\n{link}", reply_markup=main_menu_markup)
+    await update.message.reply_text(f"✅ لینک استوری دریافت شد:\n{link}")
     return ConversationHandler.END
 
 
@@ -241,7 +232,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     t_amount = update.message.text
     t_amount = int(t_amount)
 
-    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.", reply_markup=main_menu_markup)
+    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.")
     # اینجا می‌تونی پرداخت زرین‌پال رو فراخوانی کنی
     user = await get_user_by_telrgramid(update.effective_user.id)
 
@@ -258,18 +249,18 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tx.authority = authority
     await sync_to_async(tx.save)()
     if pay_url:
-        await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}", reply_markup=main_menu_markup)
+        await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
         #await update.message.reply_text(" پرداخت با موفقیت انجام شد ، کیف پول شارژ شد.")
         # tx.status = "SUCCESS"
         # tx.user.balance += tx.amount
         # await sync_to_async(tx.user.save)()
         # await sync_to_async(tx.save)()
     else:
-        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.", reply_markup=main_menu_markup)
+        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("عملیات لغو شد.", reply_markup=main_menu_markup)
+    await update.message.reply_text("عملیات لغو شد.")
     return ConversationHandler.END
 
 
@@ -277,7 +268,7 @@ conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start),CallbackQueryHandler(handle_button)],
     states={
         WAITING_POST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link),
-            CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
+            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
         WAITING_REALS_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_reals_link),
             CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
         WAITING_HIGHLIGHT_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_highlight_link),
