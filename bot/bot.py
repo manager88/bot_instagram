@@ -11,6 +11,16 @@ User = get_user_model()
 from .models import Transaction
 from .utils import request_payment
 
+main_menu_buttons = [
+    [
+        InlineKeyboardButton("🏠 منوی اصلی", callback_data="main_menu"),
+        InlineKeyboardButton("↩️ بازگشت", callback_data="back")
+    ]
+]
+main_menu_markup = InlineKeyboardMarkup(main_menu_buttons)
+
+
+
 logger = logging.getLogger(__name__)
 
 WAITING_POST_LINK = 1
@@ -63,38 +73,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-async def charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ارسال لینک پرداخت زرین‌پال"""
-
-    #user = User.objects.get(telegram_id=update.effective_user.id)
-    user = await get_user_by_telrgramid(update.effective_user.id)
-
-    t_amount = 20000  # مثلا ۲۰۰۰۰ ریال
-
-    #tx = Transaction.objects.create(user=user, amount=amount, type="TOPUP")
-    tx = await create_transaction(user, t_amount, t_type="TOPUP" , t_status=None)
-
-    pay_url, authority = request_payment(
-        amount=t_amount,
-        description="شارژ کیف پول تلگرام",
-        callback_url=settings.ZARINPAL_CALLBACK_URL,
-        merchant_id=settings.ZARINPAL_MERCHANT_ID,
-    )
-    tx.authority = authority
-    #tx.save()
-    #await sync_to_async(tx.save)()
-    if pay_url:
-        #await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
-        await update.message.reply_text(" پرداخت با موفقیت انجام شد ، کیف پول شارژ شد.")
-        tx.status = "SUCCESS"
-        tx.user.balance += tx.amount
-        #tx.user.save()
-        await sync_to_async(tx.user.save)()
-        #tx.save()
-        await sync_to_async(tx.save)()
-    else:
-        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
-
 
 
 
@@ -103,23 +81,23 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     if query.data == "download_post":
-        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست.")
+        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
         return WAITING_POST_LINK
      
     elif query.data == "download_reals":
-        await query.message.reply_text("🔗 لینک ریلز اینستاگرام رو بفرست.")
+        await query.message.reply_text("🔗 لینک ریلز اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
         return WAITING_REALS_LINK
        
     elif query.data == "download_hilight":
-        await query.message.reply_text("🔗 لینک هایلایت اینستاگرام رو بفرست.")
+        await query.message.reply_text("🔗 لینک هایلایت اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
         return WAITING_HIGHLIGHT_LINK
     
     elif query.data == "download_storeis":
-        await query.message.reply_text("🔗 لینک استوری اینستاگرام رو بفرست.")
+        await query.message.reply_text("🔗 لینک استوری اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
         return WAITING_STORY_LINK
     
     elif query.data == "charge":
-        await query.message.reply_text("💳 مبلغ شارژ مورد نظر رو وارد کن.")
+        await query.message.reply_text("💳 مبلغ شارژ مورد نظر رو وارد کن.", reply_markup=main_menu_markup)
         return WAITING_CHARGE_AMOUNT
     
     elif query.data == "balance":
@@ -128,18 +106,46 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
     
 
+
+async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "main_menu":
+        # بازگشت به منوی اصلی
+        keyboard = [
+            [InlineKeyboardButton("📥 دانلود پست اینستاگرام", callback_data="download_post")],
+            [InlineKeyboardButton("📥 دانلود ریلز اینستاگرام", callback_data="download_reals")],
+            [InlineKeyboardButton("📥 دانلود هایلایت اینستاگرام", callback_data="download_hilight")],
+            [InlineKeyboardButton("📥 دانلود استوری اینستاگرام", callback_data="download_storeis")],
+            [InlineKeyboardButton("💳 شارژ کیف پول", callback_data="charge")],
+            [InlineKeyboardButton("💰 موجودی من", callback_data="balance")],
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+        await query.message.reply_text("🏠 بازگشت به منوی اصلی:", reply_markup=markup)
+        return ConversationHandler.END
+
+    elif query.data == "back":
+        await query.message.reply_text("↩️ به مرحله قبل بازگشتید.", reply_markup=main_menu_markup)
+        return ConversationHandler.END
+
+
+
+
+
+
+
 async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
     x = link.split("/")
-    await update.message.reply_text(f"✅ پست با لینک زیر ثبت شد:\n{link}")
+    await update.message.reply_text(f"✅ پست با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
     # اینجا می‌تونی کار دانلود پست از API رو انجام بدی
     """وقتی کاربر لینک پست اینستا می‌فرسته"""
     user = await get_user_by_telrgramid(update.effective_user.id)
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید"
-        )
+            "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید", reply_markup=main_menu_markup)
         return
 
     # کم کردن از کیف پول
@@ -151,7 +157,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await create_transaction(user, cost, t_type="CHARGE", t_status="SUCCESS")
 
     
-    await update.message.reply_text("🔄 در حال دریافت پست از اینستاگرام...")
+    await update.message.reply_text("🔄 در حال دریافت پست از اینستاگرام...", reply_markup=main_menu_markup)
 
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
@@ -160,9 +166,9 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}", reply_markup=main_menu_markup)
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=main_menu_markup)
         logger.error(e)
 
     return ConversationHandler.END
@@ -171,7 +177,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
     x = link.split("/")
-    await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}")
+    await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
     # اینجا می‌تونی کار دانلود پست از API رو انجام بدی
     """وقتی کاربر لینک ریلز اینستا می‌فرسته"""
     user = await get_user_by_telrgramid(update.effective_user.id)
@@ -179,7 +185,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.balance < cost:
         await update.message.reply_text(
             "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید"
-        )
+        , reply_markup=main_menu_markup)
         return
 
     # کم کردن از کیف پول
@@ -191,7 +197,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await create_transaction(user, cost, t_type="CHARGE", t_status="SUCCESS")
 
     
-    await update.message.reply_text("🔄 در حال دریافت ریلز از اینستاگرام...")
+    await update.message.reply_text("🔄 در حال دریافت ریلز از اینستاگرام...", reply_markup=main_menu_markup)
 
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
@@ -200,9 +206,9 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}", reply_markup=main_menu_markup)
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=main_menu_markup)
         logger.error(e)
 
     return ConversationHandler.END
@@ -210,13 +216,13 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
-    await update.message.reply_text(f"✅ لینک هایلایت دریافت شد:\n{link}")
+    await update.message.reply_text(f"✅ لینک هایلایت دریافت شد:\n{link}", reply_markup=main_menu_markup)
     return ConversationHandler.END
 
 
 async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
-    await update.message.reply_text(f"✅ لینک استوری دریافت شد:\n{link}")
+    await update.message.reply_text(f"✅ لینک استوری دریافت شد:\n{link}", reply_markup=main_menu_markup)
     return ConversationHandler.END
 
 
@@ -224,7 +230,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     t_amount = update.message.text
     t_amount = int(t_amount)
 
-    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.")
+    await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.", reply_markup=main_menu_markup)
     # اینجا می‌تونی پرداخت زرین‌پال رو فراخوانی کنی
     user = await get_user_by_telrgramid(update.effective_user.id)
 
@@ -241,18 +247,18 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tx.authority = authority
     await sync_to_async(tx.save)()
     if pay_url:
-        await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
+        await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}", reply_markup=main_menu_markup)
         #await update.message.reply_text(" پرداخت با موفقیت انجام شد ، کیف پول شارژ شد.")
         # tx.status = "SUCCESS"
         # tx.user.balance += tx.amount
         # await sync_to_async(tx.user.save)()
         # await sync_to_async(tx.save)()
     else:
-        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
+        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.", reply_markup=main_menu_markup)
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("عملیات لغو شد.")
+    await update.message.reply_text("عملیات لغو شد.", reply_markup=main_menu_markup)
     return ConversationHandler.END
 
 
@@ -277,6 +283,8 @@ def run_bot():
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(conv_handler)
+
+    app.add_handler(CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$"))
 
     logger.info("🤖 Bot started...")
     app.run_polling()
