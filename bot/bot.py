@@ -81,23 +81,23 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     if query.data == "download_post":
-        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
+        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی \start کلیک کنید.")
         return WAITING_POST_LINK
      
     elif query.data == "download_reals":
-        await query.message.reply_text("🔗 لینک ریلز اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
+        await query.message.reply_text("🔗 لینک ریلز اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی \start کلیک کنید")
         return WAITING_REALS_LINK
        
     elif query.data == "download_hilight":
-        await query.message.reply_text("🔗 لینک هایلایت اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
+        await query.message.reply_text("🔗 لینک هایلایت اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی \start کلیک کنید")
         return WAITING_HIGHLIGHT_LINK
     
     elif query.data == "download_storeis":
-        await query.message.reply_text("🔗 لینک استوری اینستاگرام رو بفرست.", reply_markup=main_menu_markup)
+        await query.message.reply_text("🔗 لینک استوری اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی \start کلیک کنید")
         return WAITING_STORY_LINK
     
     elif query.data == "charge":
-        await query.message.reply_text("💳 مبلغ شارژ مورد نظر رو وارد کن.", reply_markup=main_menu_markup)
+        await query.message.reply_text("💳 مبلغ شارژ مورد نظر رو به عدد وارد کن ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی \start کلیک کنید")
         return WAITING_CHARGE_AMOUNT
     
     elif query.data == "balance":
@@ -138,14 +138,14 @@ async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
     x = link.split("/")
-    await update.message.reply_text(f"✅ پست با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
+    await update.message.reply_text(f"✅ پست با لینک زیر ثبت شد:\n{link}")
     # اینجا می‌تونی کار دانلود پست از API رو انجام بدی
     """وقتی کاربر لینک پست اینستا می‌فرسته"""
     user = await get_user_by_telrgramid(update.effective_user.id)
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید", reply_markup=main_menu_markup)
+            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی \start  افزایش دهید")
         return
 
     # کم کردن از کیف پول
@@ -157,7 +157,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await create_transaction(user, cost, t_type="CHARGE", t_status="SUCCESS")
 
     
-    await update.message.reply_text("🔄 در حال دریافت پست از اینستاگرام...", reply_markup=main_menu_markup)
+    await update.message.reply_text("🔄 در حال دریافت پست از اینستاگرام...")
 
     # دانلود پست (مثلاً با API شخص ثالث)
     try:
@@ -166,9 +166,11 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}", reply_markup=main_menu_markup)
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
+            await update.message.reply_text("بازگشت به منو اصلی با \start")
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=main_menu_markup)
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("بازگشت به منو اصلی با \start")
         logger.error(e)
 
     return ConversationHandler.END
@@ -178,6 +180,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text
     x = link.split("/")
     await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
+    #await update.message.reply_text(f"✅ ریلز با لینک زیر ثبت شد:\n{link}", reply_markup=main_menu_markup)
     # اینجا می‌تونی کار دانلود پست از API رو انجام بدی
     """وقتی کاربر لینک ریلز اینستا می‌فرسته"""
     user = await get_user_by_telrgramid(update.effective_user.id)
