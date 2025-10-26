@@ -138,7 +138,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست 😕\nبرای شارژ از دستور /charge استفاده کنید."
+            "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید"
         )
         return
 
@@ -178,7 +178,7 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست 😕\nبرای شارژ از دستور /charge استفاده کنید."
+            "موجودی کافی نیست ابتدا موجودی کیف پول افزایش دهید"
         )
         return
 
