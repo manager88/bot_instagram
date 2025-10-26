@@ -144,9 +144,9 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = await get_user_by_telrgramid(update.effective_user.id)
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
-        await update.message.reply_text(
+        update.message.reply_text(
             "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی /start  افزایش دهید\n /start")
-        return
+        return ConversationHandler.END
 
     # کم کردن از کیف پول
     user.balance -= cost
