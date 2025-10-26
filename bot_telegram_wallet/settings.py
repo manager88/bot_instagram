@@ -34,6 +34,12 @@ DEBUG = True
 #ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['api.neginbaspar.ir']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://api.neginbaspar.ir',
+]
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
