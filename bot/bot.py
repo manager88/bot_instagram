@@ -19,6 +19,9 @@ main_menu_buttons = [
 ]
 main_menu_markup = InlineKeyboardMarkup(main_menu_buttons)
 
+cancel_keyboard = InlineKeyboardMarkup([
+    [InlineKeyboardButton("❌ انصراف و بازگشت به منو", callback_data="cancel")]
+])
 
 
 logger = logging.getLogger(__name__)
@@ -81,7 +84,7 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     if query.data == "download_post":
-        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید.")
+        await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید.", reply_markup=cancel_keyboard)
         return WAITING_POST_LINK
      
     elif query.data == "download_reals":
@@ -103,6 +106,11 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "balance":
         user = await get_user_by_telrgramid(update.effective_user.id)
         await query.message.reply_text(f"💰 موجودی شما: {user.balance} ریال")
+        return ConversationHandler.END
+    
+    elif query.data == "cancel":
+        await query.message.reply_text("بازگشت به منوی اصلی ⬅️")
+        await start(update, context)  # اجرای تابع منو اصلی
         return ConversationHandler.END
     
 
