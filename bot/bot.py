@@ -14,7 +14,7 @@ from .utils import request_payment
 main_menu_buttons = [
     [
         InlineKeyboardButton("🏠 منوی اصلی", callback_data="main_menu"),
-        InlineKeyboardButton("↩️ بازگشت", callback_data="back")
+        #InlineKeyboardButton("↩️ بازگشت", callback_data="back")
     ]
 ]
 main_menu_markup = InlineKeyboardMarkup(main_menu_buttons)
