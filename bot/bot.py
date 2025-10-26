@@ -126,7 +126,7 @@ async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
     elif query.data == "back":
-        await query.message.reply_text("↩️ به مرحله قبل بازگشتید.", reply_markup=main_menu_markup)
+        await query.message.reply_text("↩️ به مرحله قبل بازگشتید.")
         return ConversationHandler.END
 
 
