@@ -160,11 +160,9 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
-            await update.message.reply_text("بازگشت به منو اصلی با \\start")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}", reply_markup=cancel_keyboard)
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
-        await update.message.reply_text("بازگشت به منو اصلی با \n /start ")
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=cancel_keyboard)
         logger.error(e)
 
     return ConversationHandler.END
@@ -227,7 +225,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         t_amount = int(t_amount)
     except ValueError:
-        await update.message.reply_text("❌ لطفاً فقط عدد وارد کنید.")
+        await update.message.reply_text("❌ لطفاً فقط عدد وارد کنید.", reply_markup=cancel_keyboard)
         return ConversationHandler.END  # خروج از تابع تا ادامه اجرا نشود
 
     await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.")
@@ -250,7 +248,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
        
     else:
-        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.")
+        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.", reply_markup=cancel_keyboard)
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
