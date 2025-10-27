@@ -165,7 +165,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e), reply_markup=cancel_keyboard)
         logger.error(e)
 
-    return ConversationHandler.END
+    
 
 
 async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
