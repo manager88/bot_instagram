@@ -102,10 +102,10 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text(f"💰 موجودی شما: {user.balance} ریال")
         return ConversationHandler.END
     
-    elif query.data == "cancel":
-        await query.message.reply_text("بازگشت به منوی اصلی ⬅️")
-        await start(update, context)  # اجرای تابع منو اصلی
-        return ConversationHandler.END
+    # elif query.data == "cancel":
+    #     await query.message.reply_text("بازگشت به منوی اصلی ⬅️")
+    #     await start(update, context)  # اجرای تابع منو اصلی
+    #     return ConversationHandler.END
     
 
 
@@ -270,13 +270,13 @@ conv_handler = ConversationHandler(
         WAITING_POST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link),
             CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
         WAITING_REALS_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_reals_link),
-            CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
+            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
         WAITING_HIGHLIGHT_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_highlight_link),
-            CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
+            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
         WAITING_STORY_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_story_link),
-            CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
+            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
         WAITING_CHARGE_AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_charge),
-            CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$")],
+            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
     },
     fallbacks=[CommandHandler("cancel", cancel)],
     per_user=True, 
@@ -291,7 +291,7 @@ def run_bot():
 
     app.add_handler(conv_handler)
 
-    app.add_handler(CallbackQueryHandler(handle_navigation, pattern="^(main_menu|back)$"))
+    app.add_handler(CallbackQueryHandler(handle_navigation, pattern="^(cancel)$"))
 
     logger.info("🤖 Bot started...")
     app.run_polling()
