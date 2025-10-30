@@ -276,18 +276,18 @@ conv_handler = ConversationHandler(
 
 
 
-
 def run_bot():
+    
+
     token = settings.TELEGRAM_TOKEN
+
+    logging.info("🤖 Bot is initializing...")
+
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(conv_handler)
-
     app.add_handler(CallbackQueryHandler(handle_navigation, pattern="^(cancel)$"))
 
-    logger.info("🤖 Bot started...")
-    app.run_polling()
-
-
-
+    logging.info("✅ Bot is running...")
+    app.run_polling(close_loop=False)  # جلوگیری از بستن event loop
 
