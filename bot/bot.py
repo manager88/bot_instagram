@@ -458,11 +458,11 @@ async def handle_highlight_detail(update: Update, context: ContextTypes.DEFAULT_
                 else:
                     await query.message.reply_photo(url)
 
-        await query.message.reply_text("✅ همه محتوای هایلایت ارسال شدند.")
+        await query.message.reply_text("✅ همه محتوای هایلایت ارسال شدند.",reply_markup=main_menu_keyboard())
 
     except Exception as e:
         logger.error(e)
-        await query.message.reply_text(f"⚠️ خطا در دریافت محتوا: {e}")
+        await query.message.reply_text(f"⚠️ خطا در دریافت محتوا: {e}",reply_markup=main_menu_keyboard())
     return MAIN_MENU
 
 
@@ -496,7 +496,7 @@ async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         resp = requests.get(f"https://api.one-api.ir/instagram/v1/user/stories/?username={link}",headers = IDPAY_HEADER,).json()
         if resp.get("status") != 200 :
-                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود هایلایت ندارید.")
+                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود استوری ندارید.")
                 return MAIN_MENU
         if not resp.get("result"):
             await update.message.reply_text("ℹ️ استوری وجود ندارد.")
@@ -510,9 +510,9 @@ async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     await update.message.reply_photo(url)
 
-        await update.message.reply_text("✅ همه محتوای هایلایت ارسال شدند.")
+        await update.message.reply_text("✅ همه محتوای استوری ارسال شدند.",reply_markup=main_menu_keyboard())
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت . بعداً تلاش کنید."+str(e),reply_markup=main_menu_keyboard())
         logger.error(e)
 
     return MAIN_MENU
