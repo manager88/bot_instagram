@@ -423,7 +423,7 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
         logger.error(e)
         await update.message.reply_text(f"⚠️ خطا در دریافت هایلایت‌ها: {e}")
 
-    return MAIN_MENU
+    return WAITING_HIGHLIGHT_LINK
 
 
 
