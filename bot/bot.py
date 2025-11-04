@@ -11,6 +11,8 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from .models import Transaction
 from .utils import request_payment
+import asyncio
+from django.db import close_old_connections
 
 
 
@@ -591,7 +593,7 @@ conv_handler = ConversationHandler(
 
 def run_bot():
     
-
+    close_old_connections()
     token = settings.TELEGRAM_TOKEN
 
     logging.info("🤖 Bot is initializing...")
@@ -604,5 +606,6 @@ def run_bot():
     app.add_handler(conv_handler)
 
     logging.info("✅ Bot is running...")
-    app.run_polling(close_loop=False)  # جلوگیری از بستن event loop
+    #app.run_polling(close_loop=False)  # جلوگیری از بستن event loop
+    asyncio.run(app.run_polling(stop_signals=None))
 

@@ -29,11 +29,12 @@ logger = logging.getLogger(__name__)
 # -------------------------------
 if __name__ == "__main__":
     while True:
+        
         try:
             logger.info("🚀 Starting Telegram bot...")
             run_bot()
         except Exception as e:
-            logger.error("❌ Bot crashed: %s", e)
-            traceback.print_exc()
+            logger.exception("❌ Bot crashed with exception:")
+        finally:
             logger.info("♻️ Restarting bot in 10 seconds...")
             time.sleep(10)
