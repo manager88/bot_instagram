@@ -595,17 +595,18 @@ def run_bot():
     
     close_old_connections()
     token = settings.TELEGRAM_TOKEN
-
     logging.info("🤖 Bot is initializing...")
 
     app = ApplicationBuilder().token(token).build()
-
-    
-    
-
     app.add_handler(conv_handler)
 
     logging.info("✅ Bot is running...")
-    #app.run_polling(close_loop=False)  # جلوگیری از بستن event loop
-    asyncio.run(app.run_polling(stop_signals=None))
+
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(app.run_polling(stop_signals=None))
+    except KeyboardInterrupt:
+        logging.info("🛑 Bot stopped manually")
+    except Exception as e:
+        logging.exception("❌ Unexpected error in bot loop:")
 
