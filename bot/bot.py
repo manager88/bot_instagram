@@ -84,7 +84,7 @@ def create_transaction(t_user, t_amount, t_type, t_status):
 
 def main_menu_keyboard():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📥 دانلود پست اینستاگرام", callback_data="download_post")],
+        [InlineKeyboardButton("📥 دانلود پست ", callback_data="download_post")],
         [InlineKeyboardButton("📥 دانلود صدای پست", callback_data="download_audio")],
         [InlineKeyboardButton("📥 دانلود ریلز", callback_data="download_reals")],
         [InlineKeyboardButton("📥 دانلود هایلایت", callback_data="download_highlight")],
@@ -131,7 +131,7 @@ async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return MAIN_MENU
 
     if data == "download_post":
-        await query.message.reply_text("🔗 لینک پست اینستاگرام را ارسال کنید:", reply_markup=cancel_keyboard)
+        await query.message.reply_text("🔗 لینک پست  را ارسال کنید:", reply_markup=cancel_keyboard)
         return WAITING_POST_LINK
 
     if data == "download_audio":
@@ -143,11 +143,11 @@ async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return WAITING_REALS_LINK
 
     if data == "download_highlight":
-        await query.message.reply_text("🔗 نام کاربری اینستاگرام را بفرستید:", reply_markup=cancel_keyboard)
+        await query.message.reply_text("🔗 نام کاربری هایلایت مورد نظر را بفرستید:", reply_markup=cancel_keyboard)
         return WAITING_HIGHLIGHT_LINK
 
     if data == "download_story":
-        await query.message.reply_text("🔗 نام کاربری اینستاگرام را بفرستید:", reply_markup=cancel_keyboard)
+        await query.message.reply_text("🔗 نام کاربری استوری مورد نظر را بفرستید:", reply_markup=cancel_keyboard)
         return WAITING_STORY_LINK
 
     if data == "charge":
@@ -162,64 +162,6 @@ async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-
-
-
-# async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     query = update.callback_query
-#     await query.answer()
-
-#     if query.data == "download_post":
-#         await query.message.reply_text("🔗 لینک پست اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید.", reply_markup=cancel_keyboard)
-#         return WAITING_POST_LINK
-    
-#     elif query.data == "download_audio":
-#         await query.message.reply_text("🔗 لینک پست یا ریلز اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید", reply_markup=cancel_keyboard)
-#         return WAITING_AUDIO_LINK
-     
-#     elif query.data == "download_reals":
-#         await query.message.reply_text("🔗 لینک ریلز اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید", reply_markup=cancel_keyboard)
-#         return WAITING_REALS_LINK
-       
-#     elif query.data == "download_hilight":
-#         await query.message.reply_text("🔗 لینک هایلایت اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید", reply_markup=cancel_keyboard)
-#         return WAITING_HIGHLIGHT_LINK
-    
-#     elif query.data == "download_storeis":
-#         await query.message.reply_text("🔗 لینک استوری اینستاگرام رو بفرست ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید", reply_markup=cancel_keyboard)
-#         return WAITING_STORY_LINK
-    
-#     elif query.data == "charge":
-#         await query.message.reply_text("💳 مبلغ شارژ مورد نظر رو به عدد وارد کن ، در صورت انصراف از ارسال جهت بازگشت به منو اصلی /start کلیک کنید", reply_markup=cancel_keyboard)
-#         return WAITING_CHARGE_AMOUNT
-    
-#     elif query.data == "balance":
-#         user = await get_user_by_telrgramid(update.effective_user.id)
-#         await query.message.reply_text(f"💰 موجودی شما: {user.balance} ریال")
-#         return ConversationHandler.END
-    
-
-
-async def handle_navigation(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    if query.data == "cancel":
-        # بازگشت به منوی اصلی
-        keyboard = [
-            [InlineKeyboardButton("📥 دانلود پست اینستاگرام", callback_data="download_post")],
-            [InlineKeyboardButton("📥 دانلود صدای پست اینستاگرام", callback_data="download_audio")],
-            [InlineKeyboardButton("📥 دانلود ریلز اینستاگرام", callback_data="download_reals")],
-            [InlineKeyboardButton("📥 دانلود هایلایت اینستاگرام", callback_data="download_hilight")],
-            [InlineKeyboardButton("📥 دانلود استوری اینستاگرام", callback_data="download_storeis")],
-            [InlineKeyboardButton("💳 شارژ کیف پول", callback_data="charge")],
-            [InlineKeyboardButton("💰 موجودی من", callback_data="balance")],
-        ]
-        markup = InlineKeyboardMarkup(keyboard)
-        await query.message.reply_text("🏠 بازگشت به منوی اصلی:", reply_markup=markup)
-        return ConversationHandler.END
-
-    
 # ============================================================
 # ✅ هندلر بازگشت به منو
 # ============================================================
@@ -245,7 +187,7 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید\n /start")
+            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید",reply_markup=main_menu_keyboard())
         return MAIN_MENU
 
     # کم کردن از کیف پول
@@ -264,9 +206,9 @@ async def handle_post_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}",reply_markup=main_menu_keyboard())
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e),reply_markup=main_menu_keyboard())
         logger.error(e)
     return MAIN_MENU
 
@@ -282,7 +224,7 @@ async def handle_audio_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید\n /start")
+            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید",reply_markup=main_menu_keyboard())
         return MAIN_MENU
 
     # کم کردن از کیف پول
@@ -300,9 +242,9 @@ async def handle_audio_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if resp['status']==200:
             
             media=resp['result']['metadata']['original_sound_info']['progressive_download_url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{media}")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{media}",reply_markup=main_menu_keyboard())
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e),reply_markup=main_menu_keyboard())
         logger.error(e)
     return MAIN_MENU
 
@@ -317,8 +259,8 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید\n /start"
-        )
+            "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید"
+        ,reply_markup=main_menu_keyboard())
         return MAIN_MENU
 
     # کم کردن از کیف پول
@@ -338,9 +280,9 @@ async def handle_reals_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             media=resp['result']['media'][0]
             download_url=media['url']
-            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}")
+            await update.message.reply_text(f"✅ لینک دانلود:\n{download_url}",reply_markup=main_menu_keyboard())
     except Exception as e:
-        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e))
+        await update.message.reply_text("❌ خطا در دریافت پست. بعداً تلاش کنید."+str(e),reply_markup=main_menu_keyboard())
         logger.error(e)
 
     return MAIN_MENU
@@ -357,8 +299,8 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
     cost = 5000  # هزینه هر دانلود (ریال)
     if user.balance < cost:
         await update.message.reply_text(
-            "❌ موجودی کافی نیست. ابتدا کیف پول خود را از منوی اصلی افزایش دهید.\n/start"
-        )
+            "❌ موجودی کافی نیست. ابتدا کیف پول خود را از منوی اصلی افزایش دهید."
+        ,reply_markup=main_menu_keyboard())
         return MAIN_MENU
 
     # کم کردن از کیف پول
@@ -378,7 +320,7 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
                 user_data = await resp.json()
 
             if user_data.get("status") != 200:
-                await update.message.reply_text("❌ کاربر یافت نشد.")
+                await update.message.reply_text("❌ کاربر یافت نشد.",reply_markup=main_menu_keyboard())
                 return MAIN_MENU
 
             user_id = user_data["result"]["id"]
@@ -393,7 +335,7 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
                 highlights = await resp2.json()
 
             if highlights.get("status") != 200 or not highlights.get("result"):
-                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود هایلایت ندارید.")
+                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود هایلایت ندارید.",reply_markup=main_menu_keyboard())
                 return MAIN_MENU
 
             keyboard = []
@@ -413,7 +355,7 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
                 )
             except Exception as e:
                 logger.error(e)
-                await update.message.reply_text(f"⚠️ هایلایت وجود ندارد: {e}")
+                await update.message.reply_text(f"⚠️ هایلایت وجود ندارد: {e}",reply_markup=main_menu_keyboard())
 
                 return MAIN_MENU
 
@@ -423,7 +365,7 @@ async def handle_highlight_link(update: Update, context: ContextTypes.DEFAULT_TY
 
     except Exception as e:
         logger.error(e)
-        await update.message.reply_text(f"⚠️ خطا در دریافت هایلایت‌ها: {e}")
+        await update.message.reply_text(f"⚠️ خطا در دریافت هایلایت‌ها: {e}",reply_markup=main_menu_keyboard())
 
     return WAITING_HIGHLIGHT_LINK
 
@@ -449,7 +391,7 @@ async def handle_highlight_detail(update: Update, context: ContextTypes.DEFAULT_
                 data = await resp.json()
 
             if data.get("status") != 200 or not data.get("result"):
-                await query.message.reply_text("❌ خطا در دریافت محتوای هایلایت.")
+                await query.message.reply_text("❌ خطا در دریافت محتوای هایلایت.",reply_markup=main_menu_keyboard())
                 return MAIN_MENU
 
             for media in data["result"]:
@@ -481,7 +423,7 @@ async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.balance < cost:
         await update.message.reply_text(
             "موجودی کافی نیست ابتدا موجودی کیف پول خود را از منو اصلی افزایش دهید"
-        )
+        ,reply_markup=main_menu_keyboard())
         return MAIN_MENU
 
     # کم کردن از کیف پول
@@ -498,10 +440,10 @@ async def handle_story_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         resp = requests.get(f"https://api.one-api.ir/instagram/v1/user/stories/?username={link}",headers = IDPAY_HEADER,).json()
         if resp.get("status") != 200 :
-                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود استوری ندارید.")
+                await update.message.reply_text("ℹ️ اکانت این کاربر خصوصی است و اجازه دانلود استوری ندارید.",reply_markup=main_menu_keyboard())
                 return MAIN_MENU
         if not resp.get("result"):
-            await update.message.reply_text("ℹ️ استوری وجود ندارد.")
+            await update.message.reply_text("ℹ️ استوری وجود ندارد.",reply_markup=main_menu_keyboard())
             return MAIN_MENU
 
         for item in resp['result']:
@@ -527,7 +469,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         t_amount = int(t_amount)
     except ValueError:
-        await update.message.reply_text("❌ لطفاً فقط عدد وارد کنید.", reply_markup=cancel_keyboard)
+        await update.message.reply_text("❌ لطفاً فقط عدد وارد کنید.",reply_markup=main_menu_keyboard())
         return MAIN_MENU # خروج از تابع تا ادامه اجرا نشود
 
     await update.message.reply_text(f"💳 درخواست شارژ به مبلغ {str(t_amount)} ریال ثبت شد.")
@@ -550,7 +492,7 @@ async def handle_charge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"برای پرداخت، روی لینک زیر کلیک کنید:\n{pay_url}")
        
     else:
-        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.", reply_markup=cancel_keyboard)
+        await update.message.reply_text("❌ خطا در ارتباط با زرین‌پال.",reply_markup=main_menu_keyboard())
     return MAIN_MENU
 
 # async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -569,7 +511,7 @@ conv_handler = ConversationHandler(
             CallbackQueryHandler(handle_cancel, pattern="^(cancel)$"),
         ],
         WAITING_POST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link),
-            CallbackQueryHandler(handle_navigation, pattern="^(cancel)$")],
+            CallbackQueryHandler(handle_cancel, pattern="^(cancel)$")],
         WAITING_AUDIO_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_audio_link),
             CallbackQueryHandler(handle_cancel, pattern="^(cancel)$")],
         WAITING_REALS_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_reals_link),
