@@ -110,6 +110,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_user = update.effective_user
     if tg_user.username and tg_user.full_name:
         user, created = await get_or_create_user(tg_user.id, tg_user.username, tg_user.full_name)
+    elif tg_user.full_name:
+        user, created = await get_or_create_user(tg_user.id, tg_user.id, tg_user.full_name)
     else:
         user, created = await get_or_create_user(tg_user.id, tg_user.id, tg_user.id)
 
