@@ -55,11 +55,11 @@ IDPAY_HEADER = {
 ############################ sync_to_async ############################
 
 @sync_to_async
-def get_or_create_user(tg_user):
+def get_or_create_user(id, username, fullname):
     return User.objects.get_or_create(
-        telegram_id=tg_user.id,
-        username=tg_user.username,
-        first_name=tg_user.full_name,
+        telegram_id=id,
+        username=username,
+        first_name=fullname,
     )
 
 @sync_to_async
@@ -108,9 +108,11 @@ def main_menu_keyboard():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_user = update.effective_user
-    
+    if tg_user.username and tg_user.full_name:
+        user, created = await get_or_create_user(tg_user.id, tg_user.username, tg_user.full_name)
+    else:
+        user, created = await get_or_create_user(tg_user.id, tg_user.id, tg_user.id)
 
-    user, created = await get_or_create_user(tg_user)
 
     await update.message.reply_text(
         "سلام! 👋 یکی از گزینه‌ها را انتخاب کن:",
