@@ -52,30 +52,56 @@ IDPAY_HEADER = {
 
 
 
+
 ############################ sync_to_async ############################
 
 @sync_to_async
 def get_or_create_user(id, username, fullname):
-    return User.objects.get_or_create(
+    close_old_connections()
+    user, created = User.objects.get_or_create(
         telegram_id=id,
-        username=username,
-        first_name=fullname,
+        defaults={"username": username, "first_name": fullname},
     )
+    close_old_connections()
+    return user, created
+
 
 @sync_to_async
 def get_user_by_telrgramid(telegramId):
-    return User.objects.get(telegram_id = telegramId)
+    close_old_connections()
+    user = User.objects.get(telegram_id=telegramId)
+    close_old_connections()
+    return user
+
 
 @sync_to_async
-def create_transaction(t_user, t_amount, t_type, t_status):
-    if t_status:
-        return Transaction.objects.create(user=t_user, amount=t_amount, type=t_type, status=t_status)
-    else:
-        return Transaction.objects.create(user=t_user, amount=t_amount, type=t_type)
-
+def create_transaction(t_user, t_amount, t_type, t_status=None):
+    close_old_connections()
+    tx = Transaction.objects.create(
+        user=t_user,
+        amount=t_amount,
+        type=t_type,
+        status=t_status or "PENDING",
+    )
+    close_old_connections()
+    return tx
 ############################ sync_to_async ############################
 
 
+
+############################ periodic DB keep-alive ############################
+
+async def keep_db_connections_alive():
+    """تسک پس‌زمینه برای بستن کانکشن‌های قدیمی و نگه داشتن دیتابیس پایدار"""
+    while True:
+        try:
+            await sync_to_async(close_old_connections)()
+            logger.debug("🔄 Database connections refreshed")
+        except Exception as e:
+            logger.warning(f"⚠️ DB refresh failed: {e}")
+        await asyncio.sleep(300)  # هر ۵ دقیقه یک‌بار
+
+############################ periodic DB keep-alive ############################
 
 
 # ============================================================
@@ -92,18 +118,6 @@ def main_menu_keyboard():
         [InlineKeyboardButton("💳 شارژ کیف پول", callback_data="charge")],
         [InlineKeyboardButton("💰 موجودی من", callback_data="balance")],
     ])
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -508,12 +522,7 @@ conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
     states={
         MAIN_MENU: [
-            CallbackQueryHandler(handle_main_menu),
-        ],
-        WAITING_POST_LINK: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link),
-            CallbackQueryHandler(handle_cancel, pattern="^(cancel)$"),
-        ],
+            CallbackQueryHandler(handle_main_menu)],
         WAITING_POST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_link),
             CallbackQueryHandler(handle_cancel, pattern="^(cancel)$")],
         WAITING_AUDIO_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_audio_link),
@@ -538,7 +547,6 @@ conv_handler = ConversationHandler(
 
 
 def run_bot():
-    
     close_old_connections()
     token = settings.TELEGRAM_TOKEN
     logging.info("🤖 Bot is initializing...")
@@ -546,13 +554,14 @@ def run_bot():
     app = ApplicationBuilder().token(token).build()
     app.add_handler(conv_handler)
 
-    logging.info("✅ Bot is running...")
-
+    # ✅ اجرای تسک پس‌زمینه برای مدیریت اتصال پایدار دیتابیس
     loop = asyncio.get_event_loop()
+    loop.create_task(keep_db_connections_alive())
+
+    logging.info("✅ Bot is running...")
     try:
         loop.run_until_complete(app.run_polling(stop_signals=None))
     except KeyboardInterrupt:
         logging.info("🛑 Bot stopped manually")
     except Exception as e:
         logging.exception("❌ Unexpected error in bot loop:")
-

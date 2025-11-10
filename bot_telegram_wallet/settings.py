@@ -99,6 +99,11 @@ DATABASES = {
         'HOST':"botinstagram-mgd-service",
         'USER': "root",
         'PASSWORD':"tn25LejucaPWEEWZ5mpt",
+        'CONN_MAX_AGE': 60,  # ⬅️ اتصال‌ها ۶۰ ثانیه زنده می‌مانند
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'connect_timeout': 10,
+        },
     }
 }
 
